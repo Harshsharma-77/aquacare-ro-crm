@@ -12,6 +12,7 @@ import {
   Wrench,
   MoreVertical,
   Download,
+  Upload,
   ExternalLink,
   ChevronDown,
   Clock,
@@ -36,6 +37,7 @@ interface CustomerListProps {
   onOpenNewCustomer: () => void;
   onLogServiceForCustomer: (customer: Customer) => void;
   onShowQRSticker: (customer: Customer) => void;
+  onOpenImportExcel?: () => void;
 }
 
 export const CustomerList: React.FC<CustomerListProps> = ({
@@ -46,7 +48,8 @@ export const CustomerList: React.FC<CustomerListProps> = ({
   onDeleteCustomer,
   onOpenNewCustomer,
   onLogServiceForCustomer,
-  onShowQRSticker
+  onShowQRSticker,
+  onOpenImportExcel
 }) => {
   const [searchQuery, setSearchQuery] = React.useState('');
   const [filterDue, setFilterDue] = React.useState<string>('all');
@@ -113,7 +116,18 @@ export const CustomerList: React.FC<CustomerListProps> = ({
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5 w-full sm:w-auto">
+        <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
+          {onOpenImportExcel && (
+            <button
+              onClick={onOpenImportExcel}
+              className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3.5 py-2.5 bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-200 rounded-xl text-xs font-semibold transition"
+              title="Import Customers from Excel XLSX / CSV"
+            >
+              <Upload className="w-4 h-4" />
+              <span>Import Excel</span>
+            </button>
+          )}
+
           <button
             onClick={() => exportCustomersToExcel(filteredCustomers)}
             className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition"

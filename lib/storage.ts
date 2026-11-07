@@ -125,6 +125,43 @@ class StorageService {
     this.setCustomers(customers);
   }
 
+  public saveCustomersBatch(newBatch: (Partial<Customer> & { name: string; phone: string })[]): number {
+    const customers = this.getCustomers();
+    const now = new Date().toISOString().split('T')[0];
+    let count = 0;
+
+    for (const customer of newBatch) {
+      if (!customer.name || !customer.phone) continue;
+      const newCustomer: Customer = {
+        id: `cust-${Date.now()}-${Math.random().toString(36).substr(2, 4)}-${count}`,
+        name: customer.name.trim(),
+        phone: String(customer.phone).trim(),
+        alternatePhone: customer.alternatePhone ? String(customer.alternatePhone).trim() : '',
+        address: customer.address ? customer.address.trim() : '',
+        area: customer.area ? customer.area.trim() : '',
+        googleMapsUrl: customer.googleMapsUrl || `https://maps.google.com/?q=${encodeURIComponent([customer.address, customer.area].filter(Boolean).join(', ') || customer.name)}`,
+        latitude: customer.latitude,
+        longitude: customer.longitude,
+        roBrand: customer.roBrand ? customer.roBrand.trim() : 'Kent',
+        roModel: customer.roModel ? customer.roModel.trim() : 'Standard RO Purifier',
+        installationDate: customer.installationDate || now,
+        rawWaterTds: customer.rawWaterTds ? Number(customer.rawWaterTds) : undefined,
+        outputTds: customer.outputTds ? Number(customer.outputTds) : undefined,
+        notes: customer.notes ? customer.notes.trim() : '',
+        status: customer.status || 'active',
+        createdAt: now,
+        updatedAt: now,
+        nextServiceDueDate: customer.nextServiceDueDate || now
+      };
+      customers.unshift(newCustomer);
+      this.syncToSupabase('customers', newCustomer);
+      count++;
+    }
+
+    this.setCustomers(customers);
+    return count;
+  }
+
   // ================= SERVICES =================
   public getServices(): ServiceRecord[] {
     if (!this.isBrowser()) return defaultServices;

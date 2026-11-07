@@ -31,6 +31,7 @@ import { Sidebar } from '@/components/Sidebar';
 import { DashboardOverview } from '@/components/DashboardOverview';
 import { CustomerList } from '@/components/CustomerList';
 import { CustomerModal } from '@/components/CustomerModal';
+import { CustomerImportModal } from '@/components/CustomerImportModal';
 import { CustomerDetailModal } from '@/components/CustomerDetailModal';
 import { ServiceLogModal } from '@/components/ServiceLogModal';
 import { ServiceHistoryList } from '@/components/ServiceHistoryList';
@@ -54,6 +55,7 @@ export default function Home() {
   // 2. Modals State
   const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
   const [customerToEdit, setCustomerToEdit] = useState<Customer | null>(null);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
   const [isCustomerDetailOpen, setIsCustomerDetailOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
@@ -108,6 +110,15 @@ export default function Home() {
         confetti({ particleCount: 50, spread: 60, origin: { y: 0.85 } });
       } catch {}
     }
+  };
+
+  const handleBatchImportCustomers = (imported: (Partial<Customer> & { name: string; phone: string })[]) => {
+    const count = storage.saveCustomersBatch(imported);
+    loadData();
+    try {
+      confetti({ particleCount: 80, spread: 80, origin: { y: 0.7 } });
+    } catch {}
+    alert(`Successfully imported ${count} customers from Excel!`);
   };
 
   const handleDeleteCustomer = (id: string) => {
@@ -252,6 +263,7 @@ export default function Home() {
                 setQrCustomerTarget(c);
                 setIsQRModalOpen(true);
               }}
+              onOpenImportExcel={() => setIsImportModalOpen(true)}
             />
           )}
 
@@ -385,6 +397,13 @@ export default function Home() {
         onClose={() => setIsCustomerModalOpen(false)}
         onSave={handleSaveCustomer}
         customerToEdit={customerToEdit}
+      />
+
+      {/* 1.1 Bulk Import Customer Modal */}
+      <CustomerImportModal
+        isOpen={isImportModalOpen}
+        onClose={() => setIsImportModalOpen(false)}
+        onImportSuccess={handleBatchImportCustomers}
       />
 
       {/* 2. Customer 360 Detail Modal */}
