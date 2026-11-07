@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Static Code Analyzer</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0f172a; color: #f8fafc; }
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+        }
+        .tab-btn.active {
+            border-bottom: 2px solid #3b82f6;
+            color: #60a5fa;
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col font-sans overflow-hidden">
+    
+    <!-- Navbar -->
+    <header class="h-16 border-b border-slate-700 bg-slate-900 flex items-center justify-between px-6 shrink-0">
+        <div class="flex items-center space-x-3">
+            <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-bold text-xl">S</div>
+            <h1 class="text-xl font-semibold tracking-wide">Static Analyzer <span class="text-xs text-blue-400 bg-blue-900/50 px-2 py-1 rounded ml-2">Mini-C</span></h1>
+        </div>
+        <div>
+            <button id="analyze-btn" class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-md font-medium transition-colors shadow-[0_0_15px_rgba(37,99,235,0.4)] flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg>
+                Analyze Code
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex overflow-hidden">
+        
+        <!-- Left Panel: Editor -->
+        <section class="w-1/2 flex flex-col border-r border-slate-700">
+            <div class="h-10 bg-slate-800 flex items-center px-4 text-sm text-slate-400 border-b border-slate-700 shrink-0">
+                <span>main.c</span>
+            </div>
+            <div id="editor" class="flex-1 w-full"></div>
+        </section>
+
+        <!-- Right Panel: Results -->
+        <section class="w-1/2 flex flex-col bg-slate-900/50">
+            
+            <!-- Tabs -->
+            <div class="h-12 border-b border-slate-700 flex px-2 shrink-0">
+                <button class="tab-btn active px-4 h-full text-sm font-medium text-slate-400 hover:text-slate-200 transition-colors" data-target="errors-panel">Issues</button>
+                <button class="tab-btn px-4 h-full text-sm font-medium text-slate-400 hover:text-slate-200 transition-colors" data-target="tokens-panel">Tokens</button>
+                <button class="tab-btn px-4 h-full text-sm font-medium text-slate-400 hover:text-slate-200 transition-colors" data-target="ast-panel">Syntax Tree</button>
+                <button class="tab-btn px-4 h-full text-sm font-medium text-slate-400 hover:text-slate-200 transition-colors" data-target="symbol-panel">Symbol Table</button>
+            </div>
+
+            <!-- Tab Contents -->
+            <div class="flex-1 overflow-auto custom-scrollbar relative p-4">
+                
+                <!-- Errors Panel -->
+                <div id="errors-panel" class="tab-content h-full">
+                    <div id="errors-list" class="space-y-3">
+                        <div class="text-slate-500 text-center mt-10">
+                            <p>Click "Analyze Code" to see issues.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tokens Panel -->
+                <div id="tokens-panel" class="tab-content h-full hidden">
+                    <table class="w-full text-sm text-left">
+                        <thead class="text-xs text-slate-400 uppercase bg-slate-800">
+                            <tr>
+                                <th class="px-4 py-2 rounded-tl-lg">Type</th>
+                                <th class="px-4 py-2">Value</th>
+                                <th class="px-4 py-2">Line</th>
+                                <th class="px-4 py-2 rounded-tr-lg">Col</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tokens-table-body">
+                            <!-- Tokens go here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- AST Panel -->
+                <div id="ast-panel" class="tab-content h-full hidden text-sm font-mono whitespace-pre text-green-400">
+                    <div id="ast-content">Tree will appear here...</div>
+                </div>
+
+                <!-- Symbol Table Panel -->
+                <div id="symbol-panel" class="tab-content h-full hidden">
+                    <table class="w-full text-sm text-left">
+                        <thead class="text-xs text-slate-400 uppercase bg-slate-800">
+                            <tr>
+                                <th class="px-4 py-2 rounded-tl-lg">Variable</th>
+                                <th class="px-4 py-2">Type</th>
+                                <th class="px-4 py-2">Line</th>
+                                <th class="px-4 py-2">Used</th>
+                                <th class="px-4 py-2 rounded-tr-lg">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="symbol-table-body">
+                            <!-- Symbols go here -->
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Monaco Editor Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.39.0/min/vs/loader.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
