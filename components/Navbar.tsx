@@ -12,7 +12,8 @@ import {
   Database,
   Cloud,
   CheckCircle2,
-  AlertTriangle
+  AlertTriangle,
+  LogOut
 } from 'lucide-react';
 import { AppSettings, Customer } from '@/types';
 import { getServiceUrgency } from '@/lib/utils';
@@ -25,6 +26,7 @@ interface NavbarProps {
   onOpenWhatsAppHub: () => void;
   onOpenSettings: () => void;
   onSelectCustomer: (customer: Customer) => void;
+  onLogout?: () => void;
   activeTab: string;
 }
 
@@ -36,6 +38,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenWhatsAppHub,
   onOpenSettings,
   onSelectCustomer,
+  onLogout,
   activeTab
 }) => {
   const [searchQuery, setSearchQuery] = React.useState('');
@@ -248,6 +251,17 @@ export const Navbar: React.FC<NavbarProps> = ({
           >
             <Settings className="w-5 h-5" />
           </button>
+
+          {/* Logout Trigger */}
+          {onLogout && (
+            <button
+              onClick={onLogout}
+              className="p-2 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-xl transition"
+              title="Sign Out / Lock Portal"
+            >
+              <LogOut className="w-5 h-5" />
+            </button>
+          )}
         </div>
       </div>
     </header>

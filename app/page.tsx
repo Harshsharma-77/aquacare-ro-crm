@@ -42,8 +42,13 @@ import { ReportsAnalytics } from '@/components/ReportsAnalytics';
 import { MachineQRStickerModal } from '@/components/MachineQRStickerModal';
 import { ServiceInvoiceModal } from '@/components/ServiceInvoiceModal';
 import { SettingsModal } from '@/components/SettingsModal';
+import { LoginScreen } from '@/components/LoginScreen';
+import { checkIsAuthenticated, logoutAdmin } from '@/lib/auth';
 
 export default function Home() {
+  // 0. Auth State
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+
   // 1. Core State
   const [activeTab, setActiveTab] = useState<string>('dashboard');
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -83,13 +88,22 @@ export default function Home() {
 
   useEffect(() => {
     loadData();
+    setIsAuthenticated(checkIsAuthenticated());
 
     const handleStorageUpdate = () => {
       loadData();
     };
 
+    const handleAuthChange = () => {
+      setIsAuthenticated(checkIsAuthenticated());
+    };
+
     window.addEventListener('aquaflow_storage_updated', handleStorageUpdate);
-    return () => window.removeEventListener('aquaflow_storage_updated', handleStorageUpdate);
+    window.addEventListener('aquacare_auth_changed', handleAuthChange);
+    return () => {
+      window.removeEventListener('aquaflow_storage_updated', handleStorageUpdate);
+      window.removeEventListener('aquacare_auth_changed', handleAuthChange);
+    };
   }, []);
 
   // Compute urgent due count for notifications & badges
@@ -173,6 +187,24 @@ export default function Home() {
     setTechnicians(techs);
   };
 
+  if (isAuthenticated === null) {
+    return (
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+        <div className="w-9 h-9 border-4 border-teal-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <LoginScreen
+        onLoginSuccess={() => setIsAuthenticated(true)}
+        shopName={settings.shopName}
+        tagline={settings.tagline}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-slate-50">
       {/* Top Navbar */}
@@ -193,6 +225,10 @@ export default function Home() {
           setSelectedCustomer(cust);
           setIsCustomerDetailOpen(true);
         }}
+        onLogout={() => {
+          logoutAdmin();
+          setIsAuthenticated(false);
+        }}
         activeTab={activeTab}
       />
 
@@ -206,6 +242,10 @@ export default function Home() {
             dueCount={dueCount}
             lowStockCount={lowStockCount}
             onOpenSettings={() => setIsSettingsModalOpen(true)}
+            onLogout={() => {
+              logoutAdmin();
+              setIsAuthenticated(false);
+            }}
           />
         </div>
 

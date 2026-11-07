@@ -17,11 +17,14 @@ import {
   Code,
   Copy,
   Plus,
-  Trash2
+  Trash2,
+  Lock,
+  KeyRound
 } from 'lucide-react';
 import { AppSettings, Technician } from '@/types';
 import { storage } from '@/lib/storage';
 import { createSupabaseClient } from '@/lib/supabaseClient';
+import { updateAdminPassword, getAdminCredentials } from '@/lib/auth';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -42,7 +45,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onSaveTechnicians,
   onDataReset
 }) => {
-  const [activeSubTab, setActiveSubTab] = useState<'general' | 'supabase' | 'technicians' | 'backup'>('general');
+  const [activeSubTab, setActiveSubTab] = useState<'general' | 'supabase' | 'technicians' | 'backup' | 'security'>('general');
+
+  // Password state
+  const [oldPassword, setOldPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordMsg, setPasswordMsg] = useState<{ text: string; isError: boolean } | null>(null);
 
   // Form State
   const [shopName, setShopName] = useState(settings.shopName);
@@ -248,6 +257,18 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           >
             <Cloud className="w-3.5 h-3.5" />
             <span>Backup & Restore</span>
+          </button>
+
+          <button
+            onClick={() => setActiveSubTab('security')}
+            className={`pb-2.5 px-3 border-b-2 transition flex items-center gap-1.5 ${
+              activeSubTab === 'security'
+                ? 'border-teal-600 text-teal-800 font-bold'
+                : 'border-transparent text-slate-500 hover:text-slate-800'
+            }`}
+          >
+            <Lock className="w-3.5 h-3.5" />
+            <span>Security & Login</span>
           </button>
         </div>
 
@@ -607,6 +628,94 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   Reset Sample Data
                 </button>
               </div>
+            </div>
+          )}
+
+          {/* TAB 5: Security & Admin Login */}
+          {activeSubTab === 'security' && (
+            <div className="space-y-4 max-w-md">
+              <div className="bg-teal-50 border border-teal-200 rounded-2xl p-4">
+                <div className="flex items-center gap-2 text-teal-900 font-bold text-sm mb-1">
+                  <Lock className="w-4 h-4 text-teal-700" />
+                  <span>Admin Portal Password</span>
+                </div>
+                <p className="text-slate-600 leading-relaxed text-[11px]">
+                  Change your master login password to keep unauthorized staff or visitors from accessing customer data and financials.
+                </p>
+              </div>
+
+              {passwordMsg && (
+                <div className={`p-3 rounded-xl border flex items-center gap-2 ${
+                  passwordMsg.isError ? 'bg-red-50 border-red-200 text-red-700' : 'bg-emerald-50 border-emerald-200 text-emerald-800 font-bold'
+                }`}>
+                  {passwordMsg.isError ? <AlertCircle className="w-4 h-4 shrink-0" /> : <CheckCircle2 className="w-4 h-4 shrink-0" />}
+                  <span>{passwordMsg.text}</span>
+                </div>
+              )}
+
+              <form onSubmit={(e) => {
+                e.preventDefault();
+                setPasswordMsg(null);
+                if (newPassword !== confirmPassword) {
+                  setPasswordMsg({ text: 'New passwords do not match.', isError: true });
+                  return;
+                }
+                const res = updateAdminPassword(oldPassword, newPassword);
+                if (res.success) {
+                  setPasswordMsg({ text: res.message, isError: false });
+                  setOldPassword('');
+                  setNewPassword('');
+                  setConfirmPassword('');
+                } else {
+                  setPasswordMsg({ text: res.message, isError: true });
+                }
+              }} className="space-y-3">
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">Current Password *</label>
+                  <input
+                    type="password"
+                    required
+                    placeholder="Enter current password"
+                    value={oldPassword}
+                    onChange={(e) => setOldPassword(e.target.value)}
+                    className="w-full px-3.5 py-2 border border-slate-200 rounded-xl outline-none focus:border-teal-500 font-mono"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">New Password * (Min 6 characters)</label>
+                  <input
+                    type="password"
+                    required
+                    placeholder="Enter new strong password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    className="w-full px-3.5 py-2 border border-slate-200 rounded-xl outline-none focus:border-teal-500 font-mono"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">Confirm New Password *</label>
+                  <input
+                    type="password"
+                    required
+                    placeholder="Re-enter new password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="w-full px-3.5 py-2 border border-slate-200 rounded-xl outline-none focus:border-teal-500 font-mono"
+                  />
+                </div>
+
+                <div className="pt-2">
+                  <button
+                    type="submit"
+                    className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl shadow-md flex items-center gap-2 transition"
+                  >
+                    <Save className="w-4 h-4" />
+                    <span>Update Admin Password</span>
+                  </button>
+                </div>
+              </form>
             </div>
           )}
         </div>

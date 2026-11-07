@@ -12,7 +12,8 @@ import {
   Settings,
   ShieldCheck,
   Sparkles,
-  ChevronRight
+  ChevronRight,
+  LogOut
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -21,6 +22,7 @@ interface SidebarProps {
   dueCount: number;
   lowStockCount: number;
   onOpenSettings: () => void;
+  onLogout?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -28,7 +30,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   setActiveTab,
   dueCount,
   lowStockCount,
-  onOpenSettings
+  onOpenSettings,
+  onLogout
 }) => {
   const menuItems = [
     {
@@ -143,6 +146,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
           <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
         </button>
+
+        {onLogout && (
+          <button
+            onClick={onLogout}
+            className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-xl transition"
+          >
+            <LogOut className="w-4 h-4" />
+            <span>Sign Out Admin</span>
+          </button>
+        )}
       </div>
     </aside>
   );
