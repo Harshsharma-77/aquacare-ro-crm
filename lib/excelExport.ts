@@ -142,8 +142,8 @@ export async function parseCustomersFromExcelFile(file: File): Promise<{
 }> {
   const buffer = await file.arrayBuffer();
   const workbook = XLSX.read(buffer, { type: 'array' });
-  const firstSheetName = workbook.SheetNames[0];
-  const worksheet = workbook.Sheets[firstSheetName];
+  const sheetName = workbook.SheetNames.find(s => s.toLowerCase().includes('customer')) || workbook.SheetNames[0];
+  const worksheet = workbook.Sheets[sheetName];
   const rawRows: any[] = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
 
   const valid: (Partial<Customer> & { name: string; phone: string })[] = [];

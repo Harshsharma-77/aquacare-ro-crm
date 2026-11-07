@@ -3,13 +3,13 @@ import { defaultCustomers, defaultServices, defaultInventory, defaultTechnicians
 import { createSupabaseClient } from './supabaseClient';
 
 const STORAGE_KEYS = {
-  CUSTOMERS: 'aquaflow_customers_v1',
-  SERVICES: 'aquaflow_services_v1',
-  INVENTORY: 'aquaflow_inventory_v1',
-  TECHNICIANS: 'aquaflow_technicians_v1',
-  SETTINGS: 'aquaflow_settings_v1',
-  REMINDERS: 'aquaflow_reminders_v1',
-  INITIALIZED: 'aquaflow_initialized_v1'
+  CUSTOMERS: 'aquaflow_customers_v2',
+  SERVICES: 'aquaflow_services_v2',
+  INVENTORY: 'aquaflow_inventory_v2',
+  TECHNICIANS: 'aquaflow_technicians_v2',
+  SETTINGS: 'aquaflow_settings_v2',
+  REMINDERS: 'aquaflow_reminders_v2',
+  INITIALIZED: 'aquaflow_initialized_v2'
 };
 
 class StorageService {

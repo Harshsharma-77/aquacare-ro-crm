@@ -30,7 +30,7 @@ export type ServiceType = 'small' | 'major' | 'repair' | 'installation';
 export interface PartItem {
   id: string;
   name: string;
-  category: 'filter' | 'membrane' | 'electrical' | 'fittings' | 'body' | 'custom';
+  category: 'filter' | 'membrane' | 'electrical' | 'fittings' | 'body' | 'custom' | 'general';
   quantity: number;
   unitPrice: number;
   totalPrice: number;
