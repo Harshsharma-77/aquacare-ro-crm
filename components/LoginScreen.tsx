@@ -153,19 +153,6 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
               </>
             )}
           </button>
-
-          {/* Default Credentials Hint Box for Owner */}
-          <div className="mt-4 p-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-[11px] text-slate-600 space-y-1">
-            <div className="font-bold text-slate-800 flex items-center gap-1.5">
-              <ShieldCheck className="w-3.5 h-3.5 text-teal-600" />
-              <span>Default Admin Credentials:</span>
-            </div>
-            <div>Username: <code className="bg-slate-200/80 px-1.5 py-0.5 rounded font-bold text-slate-800">admin</code></div>
-            <div>Password: <code className="bg-slate-200/80 px-1.5 py-0.5 rounded font-bold text-slate-800">alakhkirpa@2026</code></div>
-            <p className="text-[10px] text-slate-400 pt-1">
-              You can change this password anytime inside <strong>Database & Settings</strong>.
-            </p>
-          </div>
         </form>
 
         {/* Footer Security Notice */}
